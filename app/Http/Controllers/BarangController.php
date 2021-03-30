@@ -19,9 +19,9 @@ class BarangController extends Controller
             $barang = Barang::where('kode_barang', 'like', '%'.$cari.'%')
                 ->orWhere('nama_barang', 'like', '%'.$cari.'%')
                 ->orWhere('kategori_barang', 'like', '%'.$cari.'%')
-                ->paginate(10);
+                ->paginate(5);
         } else {
-            $barang = Barang::paginate(10);
+            $barang = Barang::paginate(5);
         } 
         return view('barang.index', compact('barang'));
     }
