@@ -1,12 +1,13 @@
 @extends('barang.layouts.app')
-@section('content')
-<div class="row justify-content-center">
-    <div class="col-sm-10">
-        <h2>Data Barang</h2>
-    </div>
-
+@if ($message = Session::get('success'))
+<div class="alert alert-success">
+    <p>{{ $message }}</p>
 </div>
+@endif
 
+@section('content')
+  <h1 class="display"><strong>Data Barang</strong></h1>
+<br>
 <div class="row justify-content-end">
     <div class="col-md-4">
         <form action="{{ route('barang.index') }}" accept-charset="UTF-8" method="get">
@@ -20,50 +21,107 @@
     </div>
 </div>
 
-@if ($message = Session::get('success'))
-<div class="alert alert-success">
-    <p>{{ $message }}</p>
+<div class="table-responsive">
+    <div class="table-wrapper">
+        <div class="table-title">
+            <div class="row">
+                <div class="col-xs-6">
+                    <h2>Atur <b>Data Barang</b></h2>
+                </div>
+                <div class="col-xs-6">
+                    <a href="#addBarangModal" class="btn btn-success" data-toggle="modal"><i
+                            class="material-icons">&#xE147;</i> <span>Tambah Barang</span></a>
+                </div>
+            </div>
+        </div>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Id Barang</th>
+                    <th>Kode Barang</th>
+                    <th>Nama Barang</th>
+                    <th>Kategori Barang</th>
+                    <th>Harga</th>
+                    <th>Qty</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($barang as $Barang)
+                <tr>
+                    <td>{{ $Barang->id_barang }}</td>
+                    <td>{{ $Barang->kode_barang }}</td>
+                    <td>{{ $Barang->nama_barang }}</td>
+                    <td>{{ $Barang->kategori_barang }}</td>
+                    <td>{{ $Barang->harga }}</td>
+                    <td>{{ $Barang->qty }}</td>
+                    <td>
+                        <span style="display:inline;">
+                            <a href="{{ route('barang.show', $Barang->id_barang) }}" class="delete" data-toggle="modal"><button
+                                    class="btn btn-primary"><i class="material-icons" data-toggle="tooltip"
+                                        title="Show">&#xe417;</i></button></a>
+                            <a href="{{ route('barang.edit', $Barang->id_barang) }}" class="edit" data-toggle="modal"><button
+                                    class="btn btn-warning"><i class="material-icons" data-toggle="tooltip"
+                                        title="Edit">&#xE254;</i></button></a>
+                            <form class="hapus" action="{{ route('barang.destroy',$Barang->id_barang) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger"><i class="material-icons"
+                                        data-toggle="tooltip" title="Delete">&#xE872;</i></button>
+                            </form>
+                        </span>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        {{ $barang->links('barang.layouts.custom') }}
+    </div>
 </div>
-@endif
-
-<table class="table table-bordered">
-    <tr>
-        <th>Id Barang</th>
-        <th>Kode Barang</th>
-        <th>Nama Barang</th>
-        <th>Kategori Barang</th>
-        <th>Harga</th>
-        <th>Qty</th>
-        <th width="280px">Action</th>
-    </tr>
-    @foreach ($barang as $Barang)
-    <tr>
-
-        <td>{{ $Barang->id_barang }}</td>
-        <td>{{ $Barang->kode_barang }}</td>
-        <td>{{ $Barang->nama_barang }}</td>
-        <td>{{ $Barang->kategori_barang }}</td>
-        <td>{{ $Barang->harga }}</td>
-        <td>{{ $Barang->qty }}</td>
-        <td>
-            <form action="{{ route('barang.destroy',$Barang->id_barang) }}" method="POST">
-
-                <a class="btn btn-info" href="{{ route('barang.show', $Barang->id_barang) }}">Show</a>
-                <a class="btn btn-primary" href="{{ route('barang.edit', $Barang->id_barang) }}">Edit</a>
+<!-- Edit Modal HTML -->
+<div id="addBarangModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{{ route('barang.store') }}" id="myForm">
                 @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-danger">Delete</button>
+                <div class="modal-header">
+                    <h4 class="modal-title">Tambah Barang</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Kode Barang</label>
+                        <input type="text" class="form-control" name="kode_barang" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Barang</label>
+                        <input type="text" class="form-control" name="nama_barang" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Kategori Barang</label>
+                        <select name="kategori_barang" class="form-select" required>
+                            <option selected disabled hidden>Pilih Kategori</option>
+                            <option value="Makanan">Makanan</option>
+                            <option value="Minuman">Minuman</option>
+                            <option value="Snack">Snack</option>
+                            <option value="Kebutuhan">Kebutuhan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Harga</label>
+                        <input type="text" class="form-control" name="harga" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Qty</label>
+                        <input type="text" class="form-control" name="qty" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="button" class="btn btn-default" data-dismiss="modal" value="Batal">
+                    <input type="submit" class="btn btn-success" value="Tambah">
+                </div>
             </form>
-        </td>
-    </tr>
-    @endforeach
-</table>
-
-{{ $barang->links('barang.layouts.pagination') }}
-
-<div class="row justify-content-end">
-    <div class="col-md-2">
-        <a class="btn btn-success" href="{{ route('barang.create') }}"> Input Barang</a>
+        </div>
     </div>
 </div>
 @endsection
